@@ -1,0 +1,12 @@
+.main {
+  min-height: 100vh;
+  padding-top: 80px; /* Height of the header */
+  display: flex;
+  flex-direction: column;
+}
+
+@media (max-width: 768px) {
+  .main {
+    padding-top: 70px;
+  }
+}
