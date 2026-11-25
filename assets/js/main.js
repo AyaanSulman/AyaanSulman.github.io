@@ -587,7 +587,14 @@
     $("#reader-close").addEventListener("click", close);
     $("#reader-prev").addEventListener("click", function () { turn(-1); });
     $("#reader-next").addEventListener("click", function () { turn(1); });
-    reader.addEventListener("click", function (e) { if (e.target === reader) close(); });
+    reader.addEventListener("click", function (e) {
+      if (e.target === reader) { close(); return; }
+      var link = e.target.closest('a[href^="#"]'), el = link && document.getElementById(link.hash.slice(1));
+      if (!el || !el.classList.contains("project") || e.metaKey || e.ctrlKey || e.shiftKey) return;
+      e.preventDefault();                                 // one project to another: turn the page, so Close and Back still close
+      location.replace(link.hash);
+      $("#reader-close").focus();
+    });
     addEventListener("keydown", function (e) {
       if (!open || closing || e.altKey || e.metaKey || e.ctrlKey) return;
       if (e.key === "Escape") { e.preventDefault(); close(); }
