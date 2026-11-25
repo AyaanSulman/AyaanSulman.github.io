@@ -24,13 +24,21 @@
   <link rel="preload" href="assets/fonts/schibsted-grotesk-normal-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="assets/css/styles.css">
 
-  <!-- Apply a saved theme before first paint so there is no flash -->
+  <!-- Before first paint: apply a saved theme so there is no flash, and raise the loader -->
   <script>
     (function () {
       try {
         var t = localStorage.getItem("theme");
         if (t === "light" || t === "dark") document.documentElement.setAttribute("data-theme", t);
       } catch (e) {}
+      // Cover the page with the loader from the first paint. If loader.js never arrives, uncover it.
+      if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        var root = document.documentElement;
+        root.classList.add("is-loading");
+        // The full intro plays once; after that it is a short one.
+        try { if (localStorage.getItem("intro") === "seen") root.classList.add("is-short"); } catch (e) {}
+        setTimeout(function () { if (!window.loaderReady) root.classList.remove("is-loading"); }, 6000);
+      }
     })();
   </script>
 
@@ -49,9 +57,23 @@
     "sameAs": ["https://www.linkedin.com/in/ayaansulman", "https://github.com/AyaanSulman"]
   }
   </script>
+  <script src="assets/vendor/sakuga/words-ur.js" defer></script>
+  <script src="assets/vendor/sakuga/sakuga.js" defer></script>
   <script src="assets/js/main.js" defer></script>
+  <script src="assets/js/loader.js" defer></script>
+  <script src="assets/js/sky.js" defer></script>
 </head>
 <body>
+  <div class="loader" id="loader">
+    <div class="loader-half loader-half-a"></div>
+    <div class="loader-half loader-half-b"></div>
+    <div class="loader-inner">
+      <p class="loader-name">Ayaan Sulman</p>
+      <sakuga-progress label="Loading the page" done-label="Ready!"></sakuga-progress>
+    </div>
+    <button class="loader-skip" type="button">Skip</button>
+  </div>
+
   <a class="skip-link" href="#main">Skip to content</a>
 
   <header class="site-header">
@@ -92,8 +114,19 @@
         </div>
       </div>
       <figure class="hero-photo">
-        <img src="assets/img/ayaan.jpg" width="798" height="1000" alt="Portrait of Ayaan Sulman" fetchpriority="high">
+        <img src="assets/img/ayaan.webp" srcset="assets/img/ayaan-480.webp 480w, assets/img/ayaan.webp 798w" sizes="340px"
+             width="798" height="1000" alt="Portrait of Ayaan Sulman" fetchpriority="high">
       </figure>
+    </section>
+
+    <!-- ================= Proof: every number here is explained further down the page ================= -->
+    <section class="wrap" aria-label="In numbers">
+      <ul class="proof" id="proof">
+        <li><a href="#work"><b class="num" data-count="15">15</b> projects here, for companies, freelance clients and myself</a></li>
+        <li><a href="#work"><b class="num" data-count="4">4</b> countries with clients: the UK, France, Canada and the UAE</a></li>
+        <li><a href="#obscuranet"><b class="num" data-count="100">100</b> containers relaying ObscuraNet messages in under 2 seconds</a></li>
+        <li><a href="#about"><b>1st of 80</b> in the FCCU Google Developer Student Club contest</a></li>
+      </ul>
     </section>
 
     <!-- ================= Work ================= -->
@@ -101,18 +134,95 @@
       <div class="wrap">
         <div class="section-head">
           <h2 class="section-title" id="work-title">Work</h2>
-          <p class="section-intro">Products I've built for clients at ElkTech, Big Entities and Clicksotic, then the projects I've built at university and on my own.</p>
+          <p class="section-intro">Grouped by who I did it for: ElkTech, Big Entities, freelance clients, then university and my own.</p>
         </div>
 
-        <!-- ================= Client work ================= -->
-        <h3 class="group-title">Client work</h3>
+        <!-- ================= Filters (shown by main.js once the controls are ready) ================= -->
+        <div class="filters fx-only" role="search" aria-label="Filter projects">
+          <sakuga-tabs id="filter-kind" label="Who I did it for">
+            <option value="all">All</option>
+            <option value="elktech">ElkTech</option>
+            <option value="big-entities">Big Entities</option>
+            <option value="freelance">Freelance</option>
+            <option value="own">My own</option>
+          </sakuga-tabs>
+          <div class="filter-row">
+            <sakuga-input id="filter-text" type="search" label="Search projects" placeholder="Try PyTorch or payments"></sakuga-input>
+            <div class="filter-link">
+              <sakuga-checkbox id="filter-link">Has a link</sakuga-checkbox>
+              <sakuga-tooltip text="You can open the live site or read the code." label="What “has a link” means"></sakuga-tooltip>
+            </div>
+          </div>
+          <p class="filter-count" id="filter-count" role="status"></p>
+        </div>
+
+        <div id="project-list">
+        <!-- ================= The manga page: one panel per project. main.js cuts the slants and opens the project ================= -->
+        <div class="chapters" id="panels">
+          <section class="chapter" data-kind="elktech" aria-labelledby="chapter-elktech">
+            <div class="chapter-head">
+              <h3 id="chapter-elktech">ElkTech</h3>
+              <p class="chapter-role">Associate Software Engineer, Jan 2026 to now</p>
+              <p class="chapter-credit">Built as part of the ElkTech team. The products belong to ElkTech and its clients.</p>
+            </div>
+            <ul class="panels">
+              <li class="panel" data-for="kira"><a href="#kira"><span class="panel-shadow"><span class="panel-ink"><span class="panel-in"><span class="panel-art is-shot"><img src="assets/img/work/kira-800.webp" srcset="assets/img/work/kira-800.webp 800w, assets/img/work/kira.webp 1440w" sizes="(min-width: 900px) 600px, 94vw" width="800" height="500" loading="lazy" alt=""></span></span></span></span><span class="panel-cap"><b>Kira</b><span>One assistant for chat, meetings, payments and calls</span></span></a></li>
+              <li class="panel" data-for="naito"><a href="#naito"><span class="panel-shadow"><span class="panel-ink"><span class="panel-in"><span class="panel-art tone-lines"></span></span></span></span><svg class="panel-draw" viewBox="0 0 200 154" aria-hidden="true"><rect class="w" x="66" y="8" width="68" height="126" rx="12"/><path class="s" d="M70 88c14-22 22 8 34-14s18-6 26-18v66H70z"/><circle class="w" cx="100" cy="56" r="19"/><path class="i" d="M94 46l17 10-17 10z"/><path class="l" d="M18 60v28M32 48v52M46 64v22M154 54v40M168 42v62M182 62v26"/><path class="a" d="M84 112h32v9H84z"/></svg><span class="panel-cap"><b>Naito</b><span>Why some Reels take off</span></span></a></li>
+              <li class="panel" data-for="lean-ai-factory"><a href="#lean-ai-factory"><span class="panel-shadow"><span class="panel-ink"><span class="panel-in"><span class="panel-art tone-dots"></span></span></span></span><svg class="panel-draw" viewBox="0 0 200 154" aria-hidden="true"><path class="l" d="M60 34v-16M84 34v-16M108 34v-16M60 130v-16M84 130v-16M108 130v-16M36 58H20M36 90H20"/><rect class="w" x="36" y="34" width="96" height="80" rx="8"/><rect class="s" x="54" y="50" width="60" height="48" rx="4"/><path class="l" d="M132 74h16"/><rect class="w" x="150" y="36" width="38" height="78" rx="8"/><path class="a" d="M162 66h14v14h-14z"/><path class="l" d="M72 74h24M84 62v24"/></svg><span class="panel-cap"><b>Lean AI Factory</b><span>On-device AI for iOS apps</span></span></a></li>
+              <li class="panel" data-for="helpath"><a href="#helpath"><span class="panel-shadow"><span class="panel-ink"><span class="panel-in"><span class="panel-art is-shot"><img src="assets/img/work/helpath-800.webp" srcset="assets/img/work/helpath-800.webp 800w, assets/img/work/helpath.webp 1440w" sizes="(min-width: 900px) 600px, 94vw" width="800" height="500" loading="lazy" alt=""></span></span></span></span><span class="panel-cap"><b>Helpath</b><span>What UK refuges run on</span></span></a></li>
+            </ul>
+          </section>
+          <section class="chapter" data-kind="big-entities" aria-labelledby="chapter-big-entities">
+            <div class="chapter-head">
+              <h3 id="chapter-big-entities">Big Entities</h3>
+              <p class="chapter-role">Software Engineering Intern, Jul to Oct 2025</p>
+              <p class="chapter-credit">Built as part of the Big Entities team. The products belong to Big Entities and its clients.</p>
+            </div>
+            <ul class="panels">
+              <li class="panel" data-for="fieldforce-ai"><a href="#fieldforce-ai"><span class="panel-shadow"><span class="panel-ink"><span class="panel-in"><span class="panel-art is-shot"><img src="assets/img/work/fieldforce-800.webp" srcset="assets/img/work/fieldforce-800.webp 800w, assets/img/work/fieldforce.webp 1440w" sizes="(min-width: 900px) 600px, 94vw" width="800" height="500" loading="lazy" alt=""></span></span></span></span><span class="panel-cap"><b>FieldForce AI</b><span>Field teams, planned and tracked</span></span></a></li>
+              <li class="panel" data-for="healers"><a href="#healers"><span class="panel-shadow"><span class="panel-ink"><span class="panel-in"><span class="panel-art tone-rays"></span></span></span></span><svg class="panel-draw" viewBox="0 0 200 154" aria-hidden="true"><path class="w" d="M22 20h92a12 12 0 0 1 12 12v48a12 12 0 0 1-12 12H62L40 114V92H22a12 12 0 0 1-12-12V32a12 12 0 0 1 12-12z"/><path class="a" d="M58 34h20v14h14v18H78v14H58V66H44V48h14z"/><path class="s" d="M100 74h76a12 12 0 0 1 12 12v28a12 12 0 0 1-12 12h-12v18l-22-18h-42a12 12 0 0 1-12-12V86a12 12 0 0 1 12-12z"/><path class="l" d="M106 100h16l8-14 10 26 8-12h22"/></svg><span class="panel-cap"><b>Healers</b><span>Book a doctor in Canada</span></span></a></li>
+            </ul>
+          </section>
+          <section class="chapter" data-kind="freelance" aria-labelledby="chapter-freelance">
+            <div class="chapter-head">
+              <h3 id="chapter-freelance">Freelance</h3>
+              <p class="chapter-role">Founder of Clicksotic, Mar 2024 to Feb 2025</p>
+              <p class="chapter-credit">I started Clicksotic in my fifth semester and worked on it with my friend Shoaib Rashid.</p>
+            </div>
+            <ul class="panels">
+              <li class="panel" data-for="caroline-school-of-law"><a href="#caroline-school-of-law"><span class="panel-shadow"><span class="panel-ink"><span class="panel-in"><span class="panel-art is-shot"><img src="assets/img/work/csols-800.webp" srcset="assets/img/work/csols-800.webp 800w, assets/img/work/csols.webp 1440w" sizes="(min-width: 900px) 600px, 94vw" width="800" height="500" loading="lazy" alt=""></span></span></span></span><span class="panel-cap"><b>Caroline School of Law</b><span>A law school's site and LMS</span></span></a></li>
+              <li class="panel" data-for="dripsaint"><a href="#dripsaint"><span class="panel-shadow"><span class="panel-ink"><span class="panel-in"><span class="panel-art tone-dots"></span></span></span></span><svg class="panel-draw" viewBox="0 0 200 154" aria-hidden="true"><path class="w" d="M66 14L24 34l12 40 22-8v76h84V66l22 8 12-40-42-20c-6 16-62 16-68 0z"/><path class="s" d="M58 112h84v30H58z"/><path class="a" d="M100 50l8 18 20 2-15 13 5 20-18-11-18 11 5-20-15-13 20-2z"/></svg><span class="panel-cap"><b>DripSaint</b><span>Describe it, print it</span></span></a></li>
+            </ul>
+          </section>
+          <section class="chapter" data-kind="own" aria-labelledby="chapter-own">
+            <div class="chapter-head">
+              <h3 id="chapter-own">University and personal</h3>
+              <p class="chapter-role">My final year project, coursework and things I made for myself</p>
+            </div>
+            <ul class="panels">
+              <li class="panel" data-for="obscuranet"><a href="#obscuranet"><span class="panel-shadow"><span class="panel-ink"><span class="panel-in"><span class="panel-art tone-rays"></span></span></span></span><svg class="panel-draw" viewBox="0 0 200 154" aria-hidden="true"><path class="l" d="M22 112L64 62l52 40 44-64M64 62l52-36M116 102l62 22M22 112l94-10"/><circle class="s" cx="64" cy="62" r="15"/><circle class="w" cx="22" cy="112" r="14"/><circle class="w" cx="116" cy="102" r="15"/><circle class="w" cx="116" cy="26" r="12"/><circle class="s" cx="178" cy="124" r="13"/><rect class="w" x="136" y="22" width="54" height="38" rx="5"/><path class="l" d="M138 26l25 20 25-20"/><circle class="a" cx="190" cy="22" r="9"/></svg><span class="panel-cap"><b>ObscuraNet</b><span>Private messages, no servers</span></span></a></li>
+              <li class="panel" data-for="decentralized-learning-platform"><a href="#decentralized-learning-platform"><span class="panel-shadow"><span class="panel-ink"><span class="panel-in"><span class="panel-art tone-dots"></span></span></span></span><svg class="panel-draw" viewBox="0 0 200 154" aria-hidden="true"><path class="w" d="M100 34C78 20 48 20 26 30v86c22-10 52-10 74 4 22-14 52-14 74-4V30c-22-10-52-10-74 4z"/><path class="s" d="M100 34c22-14 52-14 74-4v86c-22-10-52-10-74 4z"/><path class="l" d="M100 34v86M42 52c14-4 28-4 42 2M42 72c14-4 28-4 42 2"/><path class="w" d="M138 42l22 36-22 14-22-14z"/><path class="a" d="M138 100l20-13-20 24-20-24z"/></svg><span class="panel-cap"><b>Decentralized Learning</b><span>Courses bought on-chain</span></span></a></li>
+              <li class="panel" data-for="mood-flicks"><a href="#mood-flicks"><span class="panel-shadow"><span class="panel-ink"><span class="panel-in"><span class="panel-art tone-lines"></span></span></span></span><svg class="panel-draw" viewBox="0 0 200 154" aria-hidden="true"><path class="w" d="M30 60h140v74H30z"/><path class="s" d="M26 36l138-22 5 24L30 60z"/><path class="l" d="M56 31l12 22M92 26l12 21M128 20l12 21"/><circle class="i" cx="82" cy="86" r="6"/><circle class="i" cx="118" cy="86" r="6"/><path class="a" d="M74 104h52c-6 22-46 22-52 0z"/></svg><span class="panel-cap"><b>Mood Flicks</b><span>Movies for how you feel</span></span></a></li>
+              <li class="panel" data-for="vulncheck"><a href="#vulncheck"><span class="panel-shadow"><span class="panel-ink"><span class="panel-in"><span class="panel-art tone-dots"></span></span></span></span><svg class="panel-draw" viewBox="0 0 200 154" aria-hidden="true"><rect class="w" x="16" y="16" width="132" height="98" rx="8"/><path class="s" d="M16 24a8 8 0 0 1 8-8h116a8 8 0 0 1 8 8v12H16z"/><path class="l" d="M34 56h44M34 74h30M34 92h38"/><circle class="w" cx="124" cy="84" r="34"/><path class="i" d="M147 107l11-9 32 32-12 12z"/><path class="a" d="M124 60l20 38h-40z"/><path class="l" d="M124 74v11M124 91v1"/></svg><span class="panel-cap"><b>VulnCheck</b><span>Find the holes in a site</span></span></a></li>
+              <li class="panel" data-for="passguard"><a href="#passguard"><span class="panel-shadow"><span class="panel-ink"><span class="panel-in"><span class="panel-art tone-rays"></span></span></span></span><svg class="panel-draw" viewBox="0 0 200 154" aria-hidden="true"><path class="l" d="M66 66V46a34 34 0 0 1 68 0v20" style="stroke-width:12"/><rect class="w" x="44" y="64" width="112" height="76" rx="10"/><path class="s" d="M44 112h112v18a10 10 0 0 1-10 10H54a10 10 0 0 1-10-10z"/><circle class="a" cx="100" cy="90" r="11"/><path class="l" d="M100 100v16"/></svg><span class="panel-cap"><b>PassGuard</b><span>Check and make passwords</span></span></a></li>
+              <li class="panel" data-for="odoolike"><a href="#odoolike"><span class="panel-shadow"><span class="panel-ink"><span class="panel-in"><span class="panel-art tone-lines"></span></span></span></span><svg class="panel-draw" viewBox="0 0 200 154" aria-hidden="true"><rect class="w" x="26" y="12" width="66" height="56" rx="7"/><rect class="s" x="108" y="12" width="66" height="56" rx="7"/><rect class="s" x="26" y="84" width="66" height="56" rx="7"/><rect class="w" x="108" y="84" width="66" height="56" rx="7"/><path class="l" d="M42 54V40M58 54V28M74 54V36M124 40h34M124 52h22M44 100l15-7 15 7v18l-15 8-15-8z"/><circle class="a" cx="141" cy="104" r="9"/><path class="i" d="M124 130c2-18 32-18 34 0z"/></svg><span class="panel-cap"><b>OdooLike</b><span>Run a small company</span></span></a></li>
+              <li class="panel" data-for="unity"><a href="#unity"><span class="panel-shadow"><span class="panel-ink"><span class="panel-in"><span class="panel-art is-shot"><img src="assets/img/work/flappy-bird-800.webp" srcset="assets/img/work/flappy-bird-800.webp 800w, assets/img/work/flappy-bird.webp 1440w" sizes="(min-width: 900px) 600px, 94vw" width="800" height="500" loading="lazy" alt=""></span></span></span></span><span class="panel-cap"><b>Unity</b><span>A game and a rental app</span></span></a></li>
+            </ul>
+          </section>
+        </div>
+
+        <div class="project-details fx-fallback">
+        <!-- ================= The full text of every project, by chapter ================= -->
+        <h3 class="group-title">ElkTech</h3>
+        <p class="group-credit">Built as part of the ElkTech team. The products belong to ElkTech and its clients.</p>
         <ul class="projects">
           <!-- Kira -->
-          <li class="project" id="kira">
+          <li class="project" id="kira" data-kind="elktech">
             <div class="project-head">
               <h4 class="project-name">Kira</h4>
               <dl class="project-facts">
-                <div><dt>Client</dt><dd>Kira AI, through ElkTech</dd></div>
+                <div><dt>Built at</dt><dd>ElkTech</dd></div>
+                <div><dt>Client</dt><dd>Kira AI</dd></div>
                 <div><dt>When</dt><dd class="num">Sep 2026 to now</dd></div>
                 <div><dt>Role</dt><dd>Full-stack engineer</dd></div>
                 <div><dt>Team</dt><dd>5 engineers</dd></div>
@@ -122,107 +232,32 @@
               <div class="project-text">
                 <p class="project-lede">An AI assistant that runs your chat, meetings, calendar, payments and phone calls, on the web, desktop, iOS and Android. The client showcased it at the Dubai AI Festival.</p>
                 <ul class="did">
-                  <li><b>Payments:</b> built Kira Pay, the in-app wallet: transfers, payouts, payment links, cards and KYC on an append-only double-entry ledger, connected to the Ellicash payment gateway.</li>
-                  <li><b>Verifiable AI actions:</b> every action Kira's agents take gets a receipt in a Merkle log stamped on Base (Ethereum L2), so anyone can check it on Basescan.</li>
-                  <li><b>Agent workflows:</b> project boards and a sales CRM where research, writing, coding, browsing and calling agents pick up tickets, with automations and email follow-ups started from chat or voice.</li>
-                  <li><b>Mobile app:</b> 10+ features in the React Native app, from an AI lawyer and a shopping agent to Kira Code, which builds and publishes apps from a GitHub repo on your phone.</li>
-                  <li><b>Offline AI on desktop:</b> the Electron app keeps working with no connection, on Qwen 3.5 4B and Whisper: 48 of 48 agent tasks in 4 languages at about 1.4&nbsp;s each.</li>
-                  <li><b>Privacy:</b> each person's data is isolated where queries run, and integrations like Slack, Notion and ClickUp can be shared with a team or kept personal.</li>
+                  <li><b>Payments:</b> built the in-app wallet and connected it to a payment provider.</li>
+                  <li><b>Verifiable AI actions:</b> built receipts for what Kira's agents do, so people can check them.</li>
+                  <li><b>Agent workflows:</b> built project boards and a CRM where AI agents work alongside people, from chat or voice.</li>
+                  <li><b>Mobile app:</b> built features across the React Native app for iOS and Android.</li>
+                  <li><b>Offline AI on desktop:</b> worked on the Electron app's offline mode, which runs on local models.</li>
+                  <li><b>Privacy:</b> worked on keeping each person's data separate and on sharing integrations with a team.</li>
                 </ul>
                 <p class="built-with"><b>Built with</b> NestJS, Prisma, PostgreSQL, Redis, BullMQ, React, React Native (Expo), Electron, viem</p>
                 <p class="project-links"><a href="https://www.kiraai.ai/" target="_blank" rel="noopener">Visit kiraai.ai</a></p>
               </div>
               <figure class="shot">
                 <div class="shot-bar" aria-hidden="true">kiraai.ai</div>
-                <img src="assets/img/work/kira.jpg" width="1440" height="900" loading="lazy"
+                <img src="assets/img/work/kira.webp" srcset="assets/img/work/kira-800.webp 800w, assets/img/work/kira.webp 1440w" sizes="(min-width: 1100px) 400px, (min-width: 900px) 65vw, 94vw"
+                     width="1440" height="900" loading="lazy"
                      alt="The kiraai.ai home page: 'Finally, an AI made for everyone', with a sign-up form and a list of Kira's features.">
               </figure>
-              <details class="more">
-                <summary><span class="toggle-mark" aria-hidden="true"></span>See everything I built on Kira</summary>
-                <div class="more-body">
-                  <div class="more-group">
-                    <h5>Payments</h5>
-                    <ul>
-                      <li>Wallets, transfers, payouts, payment links, cards, KYC, support and an admin console</li>
-                      <li>An append-only ledger where every entry balances (double-entry)</li>
-                      <li>Ellicash payment gateway integration with webhooks and key checks</li>
-                      <li>Split &amp; Settle for shared costs, savings pots, goals that fund themselves, and paying for Kira credits from the wallet</li>
-                    </ul>
-                  </div>
-                  <div class="more-group">
-                    <h5>Verifiable actions</h5>
-                    <ul>
-                      <li>Receipts for every agent action in an append-only Merkle log, stamped on Base and checkable on Basescan or Etherscan</li>
-                      <li>A live Proof Ledger screen in English, Spanish, French and Arabic, with a receipt checker</li>
-                      <li>Account erasure that removes personal data but keeps the receipts valid</li>
-                    </ul>
-                  </div>
-                  <div class="more-group">
-                    <h5>Agent workflows</h5>
-                    <ul>
-                      <li>A flow engine that hands tickets to research, writer, developer, browser, caller and lawyer agents</li>
-                      <li>Sales pipeline, contacts and companies, automations and follow-up email sequences</li>
-                      <li>Sub-tickets, epics, sprints, forms, saved views, custom fields and dashboards</li>
-                      <li>All of it can be started from chat or by voice</li>
-                    </ul>
-                  </div>
-                  <div class="more-group">
-                    <h5>Reliability</h5>
-                    <ul>
-                      <li>Kira's replies only claim actions that a tool actually ran</li>
-                      <li>Ask mode: Kira asks before acting, and one approval can cover every step of a plan</li>
-                    </ul>
-                  </div>
-                  <div class="more-group">
-                    <h5>Assistant features</h5>
-                    <ul>
-                      <li>Meeting Autopilot: follow-ups go out after one approval</li>
-                      <li>One search across meetings, calendar, mail, files and memory</li>
-                      <li>Events planner and outreach email with one-click unsubscribe</li>
-                      <li>Live controls during AI phone calls, and an Instacart option for groceries</li>
-                    </ul>
-                  </div>
-                  <div class="more-group">
-                    <h5>Privacy</h5>
-                    <ul>
-                      <li>Per-person data isolation enforced in the query layer for email, voice, private chats and more</li>
-                      <li>Personal or team sharing for Slack, ClickUp, monday.com, Notion and Calendly</li>
-                    </ul>
-                  </div>
-                  <div class="more-group">
-                    <h5>Desktop offline mode</h5>
-                    <ul>
-                      <li>Chat, voice and computer tasks run on local models when the server can't be reached</li>
-                      <li>Built the benchmark kit (agent tasks, speech-to-text, text-to-speech, spoken commands, raw model speed) and wrote the model-selection report</li>
-                      <li>Picked Qwen 3.5 4B (4-bit, llama.cpp) and Whisper large-v3-turbo (whisper.cpp). On an M1 Pro with 16&nbsp;GB:
-                        48/48 agent tasks in English, Arabic, French and Spanish with no invented actions, about 1.4&nbsp;s each;
-                        2–10% word error rate at about 1&nbsp;s per command;
-                        18 of 20 spoken commands completed end to end;
-                        34–35 tokens a second, with all three models in about 4.6&nbsp;GB</li>
-                    </ul>
-                  </div>
-                  <div class="more-group">
-                    <h5>Mobile app (React Native, Expo)</h5>
-                    <ul>
-                      <li>AI Lawyer (ask, review, draft, edit), AI Consultants, AI Storyteller, AI Shopping (storefronts, watchlist, agent chat) and a Homework assistant</li>
-                      <li>Business Cards &amp; Links with QR sharing, Notepad, Reminders, Cover Me (health and insurance), and agent suites for businesses, restaurants, realtors and salons</li>
-                      <li>Kira Pay screens rebuilt from Figma, an AI receptionist and call-agent screens, voucher redemption and a 3D memory graph</li>
-                      <li>Kira Code: pick a GitHub repo and branch, then build, preview and publish an app from your phone</li>
-                      <li>iPad layouts, swipe navigation, a draggable assistant orb with gestures and haptics, and voice barge-in</li>
-                      <li>Faster startup with lazy-loaded screens and trimmed assets, the access token moved into the WebSocket subprotocol, a Jest setup and API contract checks in CI</li>
-                    </ul>
-                  </div>
-                </div>
-              </details>
             </div>
           </li>
 
           <!-- Naito -->
-          <li class="project" id="naito">
+          <li class="project" id="naito" data-kind="elktech">
             <div class="project-head">
               <h4 class="project-name">Naito</h4>
               <dl class="project-facts">
-                <div><dt>Client</dt><dd>French client, through ElkTech</dd></div>
+                <div><dt>Built at</dt><dd>ElkTech</dd></div>
+                <div><dt>Client</dt><dd>French client</dd></div>
                 <div><dt>When</dt><dd class="num">Aug to Sep 2026</dd></div>
                 <div><dt>Role</dt><dd>Main developer</dd></div>
               </dl>
@@ -243,11 +278,11 @@
           </li>
 
           <!-- Lean AI Factory -->
-          <li class="project" id="lean-ai-factory">
+          <li class="project" id="lean-ai-factory" data-kind="elktech">
             <div class="project-head">
               <h4 class="project-name">Lean AI Factory</h4>
               <dl class="project-facts">
-                <div><dt>Client</dt><dd>ElkTech</dd></div>
+                <div><dt>Built at</dt><dd>ElkTech</dd></div>
                 <div><dt>When</dt><dd class="num">Jun to Aug 2026</dd></div>
                 <div><dt>Role</dt><dd>ML and tools engineer</dd></div>
               </dl>
@@ -268,11 +303,12 @@
           </li>
 
           <!-- Helpath -->
-          <li class="project" id="helpath">
+          <li class="project" id="helpath" data-kind="elktech">
             <div class="project-head">
               <h4 class="project-name">Helpath</h4>
               <dl class="project-facts">
-                <div><dt>Client</dt><dd>Helpath (UK), through ElkTech</dd></div>
+                <div><dt>Built at</dt><dd>ElkTech</dd></div>
+                <div><dt>Client</dt><dd>Helpath (UK)</dd></div>
                 <div><dt>When</dt><dd class="num">2026</dd></div>
                 <div><dt>Role</dt><dd>Full-stack engineer</dd></div>
               </dl>
@@ -289,24 +325,31 @@
               </div>
               <figure class="shot">
                 <div class="shot-bar" aria-hidden="true">helpath.ai</div>
-                <img src="assets/img/work/helpath.jpg" width="1440" height="900" loading="lazy" alt="The helpath.ai home page: 'Everything your refuge runs on, in one place, with AI you control.'">
+                <img src="assets/img/work/helpath.webp" srcset="assets/img/work/helpath-800.webp 800w, assets/img/work/helpath.webp 1440w" sizes="(min-width: 1100px) 400px, (min-width: 900px) 65vw, 94vw"
+                     width="1440" height="900" loading="lazy" alt="The helpath.ai home page: 'Everything your refuge runs on, in one place, with AI you control.'">
               </figure>
             </div>
           </li>
 
+        </ul>
+
+        <h3 class="group-title">Big Entities</h3>
+        <p class="group-credit">Built as part of the Big Entities team. The products belong to Big Entities and its clients.</p>
+        <ul class="projects">
           <!-- FieldForce AI -->
-          <li class="project" id="fieldforce-ai">
+          <li class="project" id="fieldforce-ai" data-kind="big-entities">
             <div class="project-head">
               <h4 class="project-name">FieldForce AI</h4>
               <dl class="project-facts">
-                <div><dt>Client</dt><dd>Pharmasol and Biocare, through Big Entities</dd></div>
+                <div><dt>Built at</dt><dd>Big Entities</dd></div>
+                <div><dt>Client</dt><dd>Pharmaceutical companies</dd></div>
                 <div><dt>When</dt><dd class="num">Jul to Oct 2025</dd></div>
                 <div><dt>Role</dt><dd>Backend engineer</dd></div>
               </dl>
             </div>
             <div class="project-body has-shot">
               <div class="project-text">
-                <p class="project-lede">A task and analytics platform that plans and tracks the work of pharmaceutical field teams. More than 2,000 people at Pharmasol and Biocare Pharmaceuticals use it.</p>
+                <p class="project-lede">A task and analytics platform that plans and tracks the work of pharmaceutical field teams.</p>
                 <ul class="did">
                   <li>Added features and fixed bugs in the .NET APIs behind its web and mobile apps.</li>
                   <li>Managed its SQL Server database.</li>
@@ -317,17 +360,19 @@
               </div>
               <figure class="shot">
                 <div class="shot-bar" aria-hidden="true">fieldforce-ai.com</div>
-                <img src="assets/img/work/fieldforce.jpg" width="1440" height="900" loading="lazy" alt="The fieldforce-ai.com home page with a tablet showing the analytics dashboard.">
+                <img src="assets/img/work/fieldforce.webp" srcset="assets/img/work/fieldforce-800.webp 800w, assets/img/work/fieldforce.webp 1440w" sizes="(min-width: 1100px) 400px, (min-width: 900px) 65vw, 94vw"
+                     width="1440" height="900" loading="lazy" alt="The fieldforce-ai.com home page with a tablet showing the analytics dashboard.">
               </figure>
             </div>
           </li>
 
           <!-- Healers -->
-          <li class="project" id="healers">
+          <li class="project" id="healers" data-kind="big-entities">
             <div class="project-head">
               <h4 class="project-name">Healers</h4>
               <dl class="project-facts">
-                <div><dt>Client</dt><dd>Canadian telehealth company, through Big Entities</dd></div>
+                <div><dt>Built at</dt><dd>Big Entities</dd></div>
+                <div><dt>Client</dt><dd>Canadian telehealth company</dd></div>
                 <div><dt>When</dt><dd class="num">Jul to Oct 2025</dd></div>
                 <div><dt>Role</dt><dd>Backend engineer</dd></div>
               </dl>
@@ -345,12 +390,18 @@
             </div>
           </li>
 
+        </ul>
+
+        <h3 class="group-title">Freelance</h3>
+        <p class="group-credit">I started Clicksotic in my fifth semester and worked on it with my friend Shoaib Rashid.</p>
+        <ul class="projects">
           <!-- Caroline School of Law -->
-          <li class="project" id="caroline-school-of-law">
+          <li class="project" id="caroline-school-of-law" data-kind="freelance">
             <div class="project-head">
               <h4 class="project-name">Caroline School of Law</h4>
               <dl class="project-facts">
-                <div><dt>Client</dt><dd>Caroline School of Legal Studies (France), through Clicksotic</dd></div>
+                <div><dt>Built at</dt><dd>Clicksotic, my startup</dd></div>
+                <div><dt>Client</dt><dd>Caroline School of Legal Studies (France)</dd></div>
                 <div><dt>When</dt><dd class="num">2024</dd></div>
                 <div><dt>Role</dt><dd>Frontend developer</dd></div>
               </dl>
@@ -367,17 +418,19 @@
               </div>
               <figure class="shot">
                 <div class="shot-bar" aria-hidden="true">csols.fr</div>
-                <img src="assets/img/work/csols.jpg" width="1440" height="630" loading="lazy" alt="The csols.fr home page: a bronze statue of Justice holding scales in front of a classical building and the French flag.">
+                <img src="assets/img/work/csols.webp" srcset="assets/img/work/csols-800.webp 800w, assets/img/work/csols.webp 1440w" sizes="(min-width: 1100px) 400px, (min-width: 900px) 65vw, 94vw"
+                     width="1440" height="630" loading="lazy" alt="The csols.fr home page: a bronze statue of Justice holding scales in front of a classical building and the French flag.">
               </figure>
             </div>
           </li>
 
           <!-- DripSaint -->
-          <li class="project" id="dripsaint">
+          <li class="project" id="dripsaint" data-kind="freelance">
             <div class="project-head">
               <h4 class="project-name">DripSaint</h4>
               <dl class="project-facts">
-                <div><dt>Client</dt><dd>DripSaint, through Clicksotic</dd></div>
+                <div><dt>Built at</dt><dd>Clicksotic, my startup</dd></div>
+                <div><dt>Client</dt><dd>DripSaint</dd></div>
                 <div><dt>When</dt><dd class="num">2024</dd></div>
                 <div><dt>Role</dt><dd>Frontend developer</dd></div>
               </dl>
@@ -396,10 +449,10 @@
         </ul>
 
         <!-- ================= Personal & university ================= -->
-        <h3 class="group-title">University and personal projects</h3>
+        <h3 class="group-title">University and personal</h3>
         <ul class="projects">
           <!-- ObscuraNet -->
-          <li class="project" id="obscuranet">
+          <li class="project" id="obscuranet" data-kind="own">
             <div class="project-head">
               <h4 class="project-name">ObscuraNet</h4>
               <dl class="project-facts">
@@ -427,7 +480,7 @@
           </li>
 
           <!-- Decentralized Learning Platform -->
-          <li class="project" id="decentralized-learning-platform">
+          <li class="project" id="decentralized-learning-platform" data-kind="own">
             <div class="project-head">
               <h4 class="project-name">Decentralized Learning Platform</h4>
               <dl class="project-facts">
@@ -449,7 +502,7 @@
           </li>
 
           <!-- Mood Flicks -->
-          <li class="project" id="mood-flicks">
+          <li class="project" id="mood-flicks" data-kind="own">
             <div class="project-head">
               <h4 class="project-name">Mood Flicks</h4>
               <dl class="project-facts">
@@ -468,7 +521,7 @@
           </li>
 
           <!-- VulnCheck -->
-          <li class="project" id="vulncheck">
+          <li class="project" id="vulncheck" data-kind="own">
             <div class="project-head">
               <h4 class="project-name">VulnCheck</h4>
               <dl class="project-facts">
@@ -490,7 +543,7 @@
           </li>
 
           <!-- PassGuard -->
-          <li class="project" id="passguard">
+          <li class="project" id="passguard" data-kind="own">
             <div class="project-head">
               <h4 class="project-name">PassGuard</h4>
               <dl class="project-facts">
@@ -512,7 +565,7 @@
           </li>
 
           <!-- OdooLike -->
-          <li class="project" id="odoolike">
+          <li class="project" id="odoolike" data-kind="own">
             <div class="project-head">
               <h4 class="project-name">OdooLike</h4>
               <dl class="project-facts">
@@ -533,7 +586,7 @@
           </li>
 
           <!-- Unity -->
-          <li class="project" id="unity">
+          <li class="project" id="unity" data-kind="own">
             <div class="project-head">
               <h4 class="project-name">Unity game and app</h4>
               <dl class="project-facts">
@@ -551,13 +604,21 @@
                 <p class="built-with"><b>Built with</b> Unity, C#</p>
               </div>
               <figure class="shot shot-pair">
-                <img src="assets/img/work/flappy-bird.jpg" width="1200" height="676" loading="lazy" alt="The Flappy Bird-style game running in the Unity editor.">
-                <img src="assets/img/work/rent-a-car.jpg" width="1200" height="676" loading="lazy" alt="The car rental app's menu, 'What would you like to do today?', with Client Data, Car Data and Records buttons.">
+                <img src="assets/img/work/flappy-bird.webp" srcset="assets/img/work/flappy-bird-800.webp 800w, assets/img/work/flappy-bird.webp 1200w" sizes="(min-width: 1100px) 400px, (min-width: 900px) 65vw, 94vw"
+                     width="1200" height="676" loading="lazy" alt="The Flappy Bird-style game running in the Unity editor.">
+                <img src="assets/img/work/rent-a-car.webp" srcset="assets/img/work/rent-a-car-800.webp 800w, assets/img/work/rent-a-car.webp 1200w" sizes="(min-width: 1100px) 400px, (min-width: 900px) 65vw, 94vw"
+                     width="1200" height="676" loading="lazy" alt="The car rental app's menu, 'What would you like to do today?', with Client Data, Car Data and Records buttons.">
                 <figcaption>Both projects in the Unity editor.</figcaption>
               </figure>
             </div>
           </li>
         </ul>
+        </div>
+        </div>
+        <div class="filter-empty" id="filter-empty" hidden>
+          <p>No projects match these filters.</p>
+          <sakuga-button variant="secondary" class="small" id="filter-clear">Clear filters</sakuga-button>
+        </div>
       </div>
     </section>
 
@@ -592,8 +653,8 @@
           <li>
             <time class="num">Mar 2024 to Feb 2025</time>
             <div>
-              <h3>Clicksotic <span class="role">Front End Developer</span></h3>
-              <p>Built frontends for the Caroline School of Law website and learning platform, and for the DripSaint apparel store.</p>
+              <h3>Clicksotic <span class="role">Founder and Front End Developer</span></h3>
+              <p>My own startup. I started it in my fifth semester and worked on it with my friend Shoaib Rashid, taking on freelance clients. I built the frontends for the Caroline School of Law website and learning platform, and for the DripSaint apparel store.</p>
             </div>
           </li>
           <li>
@@ -620,7 +681,7 @@
           <div><dt>AI and ML</dt><dd>LLM agents and tool calling, llama.cpp, whisper.cpp, Ollama, PyTorch, ONNX Runtime, Hugging Face transformers, OpenCLIP, MediaPipe, librosa, scikit-learn, model benchmarking</dd></div>
           <div><dt>Blockchain</dt><dd>Solidity, viem, Base (Ethereum L2), Merkle proofs, MetaMask</dd></div>
           <div><dt>Data and infrastructure</dt><dd>PostgreSQL, SQL Server, MongoDB, Prisma, Redis, BullMQ, Docker, Nginx, AWS S3 and EC2, Git</dd></div>
-          <div><dt>Payments and integrations</dt><dd>Double-entry ledgers, Stripe, Ellicash, Twilio, webhooks</dd></div>
+          <div><dt>Payments and integrations</dt><dd>Double-entry ledgers, Stripe, Twilio, webhooks</dd></div>
           <div><dt>Testing and tools</dt><dd>Playwright, Jest, Claude Code, Codex, Figma, Agile and Scrum</dd></div>
         </dl>
       </div>
@@ -670,12 +731,38 @@
     <section class="section" id="contact" aria-labelledby="contact-title">
       <div class="wrap">
         <h2 class="section-title" id="contact-title">Contact</h2>
-        <p class="contact-lead">I'm open to full-stack, AI/ML and blockchain roles. Email is the fastest way to reach me.</p>
+        <p class="contact-lead">Email is the fastest way to reach me.</p>
         <div class="email-line">
           <a class="email-link" href="mailto:ayaan309sulman@gmail.com">ayaan309sulman@gmail.com</a>
           <button class="btn btn-ghost btn-small copy-email" type="button" data-email="ayaan309sulman@gmail.com">Copy email</button>
           <span class="copy-status visually-hidden" role="status" aria-live="polite"></span>
         </div>
+
+        <form class="note fx-only" id="note" aria-labelledby="note-title">
+          <div class="note-head">
+            <h3 id="note-title">Write me a note</h3>
+            <sakuga-tooltip text="It opens in your own email app, ready to send." label="How this form works"></sakuga-tooltip>
+          </div>
+          <div class="note-grid">
+            <div class="note-fields">
+              <sakuga-input name="name" label="Your name" placeholder="Your name" autocomplete="name"></sakuga-input>
+              <sakuga-input name="message" label="Your message" placeholder="What's on your mind?"></sakuga-input>
+            </div>
+            <div>
+              <p class="field-label" aria-hidden="true">It's about</p>
+              <sakuga-radio name="about" label="It's about">
+                <option value="A full-time role" selected>A full-time role</option>
+                <option value="A contract project">A contract project</option>
+                <option value="Saying hello">Saying hello</option>
+              </sakuga-radio>
+            </div>
+            <div>
+              <p class="field-label" aria-hidden="true">Rate this site (optional)</p>
+              <sakuga-rating name="rating" label="Rate this site"></sakuga-rating>
+            </div>
+          </div>
+          <sakuga-button type="submit">Write the email</sakuga-button>
+        </form>
         <div class="contact-grid">
           <div>
             <h3>Elsewhere</h3>
@@ -686,7 +773,15 @@
           </div>
           <div>
             <h3>Resumes (PDF)</h3>
-            <ul class="link-list">
+            <div class="resume-pick fx-only">
+              <sakuga-radio id="resume-pick" label="Which resume">
+                <option value="resume/AyaanSulman_Resume.pdf" selected>General</option>
+                <option value="resume/AyaanSulman_Resume_Web.pdf">Full-stack</option>
+                <option value="resume/AyaanSulman_Resume_AI.pdf">AI/ML</option>
+              </sakuga-radio>
+              <sakuga-button id="resume-get">Download</sakuga-button>
+            </div>
+            <ul class="link-list fx-fallback">
               <li><a href="resume/AyaanSulman_Resume.pdf" download>General resume</a></li>
               <li><a href="resume/AyaanSulman_Resume_Web.pdf" download>Full-stack resume</a></li>
               <li><a href="resume/AyaanSulman_Resume_AI.pdf" download>AI/ML resume</a></li>
@@ -700,8 +795,28 @@
   <footer class="site-footer">
     <div class="wrap footer-inner">
       <p>&copy; <span class="year">2026</span> Ayaan Sulman</p>
-      <p>Built by hand with HTML, CSS and a little JavaScript.</p>
+      <p>Built by hand with HTML, CSS and a little JavaScript. Controls by <a href="https://github.com/finktheartist/sakuga-vfx" target="_blank" rel="noopener">Sakuga VFX</a>.</p>
     </div>
   </footer>
+
+  <!-- Opens over the page with one project's full story -->
+  <div class="reader" id="reader" role="dialog" aria-modal="true" aria-label="Project" hidden>
+    <div class="reader-page">
+      <div class="reader-bar">
+        <sakuga-button variant="secondary" class="small" id="reader-prev">Previous</sakuga-button>
+        <sakuga-button variant="secondary" class="small" id="reader-next">Next</sakuga-button>
+        <sakuga-button variant="secondary" class="small" id="reader-close">Close</sakuga-button>
+      </div>
+      <ul class="projects reader-body" id="reader-body"></ul>
+    </div>
+  </div>
+
+  <!-- Phones only, between the hero and Contact -->
+  <div class="quick-bar fx-only" id="quick-bar" role="group" aria-label="Quick contact">
+    <a class="btn btn-primary btn-small" data-fx="primary" href="mailto:ayaan309sulman@gmail.com">Email me</a>
+    <a class="btn btn-ghost btn-small" href="resume/AyaanSulman_Resume.pdf" download>Resume</a>
+  </div>
+
+  <sakuga-toast class="site-toast"></sakuga-toast>
 </body>
 </html>
